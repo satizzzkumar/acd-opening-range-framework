@@ -26,7 +26,7 @@
 indicator("ACD Opening Range Framework", overlay=true, max_labels_count=500)
 
 //================= INPUTS (SETTINGS) =================
-or_candle_num = input.int(1, "OR Candle Number (உதா: 1வது கேண்டிலுக்கு 1 என தரவும்)", minval = 1)
+or_candle_num = input.int(1, "OR Candle Number (e.g., enter 1 for the 1st candle)", minval = 1)
 stretch_len   = input.int(10, "Stretch Lookback (days)", minval = 1)
 capital_input = input.float(200000, "Capital")
 risk_input    = input.float(2.0, "Risk Per Trade (%)", minval = 0.1, step = 0.1)
@@ -41,11 +41,11 @@ stretch_calc = ta.sma(math.min(high - open, open - low), stretch_len)
      [stretch_calc[1]], 
      lookahead = barmerge.lookahead_on)
 
-var float day_stretch10 = na
+var float day_stretch = na
 new_day = ta.change(time("D")) != 0
 
 if new_day
-    day_stretch10 := d_stretch_sma
+    day_stretch := d_stretch_sma
 
 //================= OR VARIABLES =================
 var float or_h = na
@@ -75,8 +75,8 @@ if bars == or_candle_num
     ready := true
 
 //================= A / C LEVELS =================
-au_l = or_h + day_stretch10
-ad_l = or_l - day_stretch10
+au_l = or_h + day_stretch
+ad_l = or_l - day_stretch
 
 //================= TARGETS / STOPS =================
 buy_sl      = or_h 
@@ -112,5 +112,5 @@ risk_percentage = (risk_per_share_buy / buy_sl) * 100
 
 // Render the label only upon completion of the daily OR candle
 if bars == or_candle_num
-    label_text = "Stretch10: " + str.tostring(math.round(day_stretch10, 2)) + "\nQty: " + str.tostring(math.round(quantity, 0)) + " | Risk%: " + str.tostring(math.round(risk_percentage, 2)) + "%"
+    label_text = "Stretch: " + str.tostring(math.round(day_stretch, 2)) + "\nQty: " + str.tostring(math.round(quantity, 0)) + " | Risk%: " + str.tostring(math.round(risk_percentage, 2)) + "%"
     label.new(bar_index, high * 1.004, label_text, color=color.new(color.blue, 0), textcolor=color.white, style=label.style_label_down, size=size.small)
